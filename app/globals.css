@@ -162,6 +162,7 @@ h1, h2, h3, p { word-break: keep-all; }
 .rating-card label { display: block; font-size: 12px; font-weight: 800; margin-bottom: 9px; }
 .rating-card label span { color: #9aa9a5; font-weight: 400; }
 .rating-card textarea { width: 100%; min-height: 78px; resize: vertical; border: 1px solid var(--line); border-radius: 6px; padding: 13px 15px; font-size: 12px; line-height: 1.6; }
+.save-error { margin: 14px 0 -4px !important; color: #b3453e !important; text-align: center !important; font-size: 12px !important; }
 .rating-submit { margin-top: 18px; }
 .thank-you { padding: 90px 0; }
 .thank-you > p:last-of-type { margin: 18px 0 0; color: var(--muted); line-height: 1.8; }

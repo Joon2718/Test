@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { saveCareerSubmission } from "./supabase";
 
 const steps = ["시작", "과제 1", "피드백", "과제 2", "만족도"];
 
@@ -17,6 +18,8 @@ export default function Home() {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [satisfactionNote, setSatisfactionNote] = useState("");
   const [finished, setFinished] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const feedback = useMemo(() => {
     const text = taskOne.trim();
@@ -50,6 +53,28 @@ export default function Home() {
     event.preventDefault();
     setStep(target);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const submitSatisfaction = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!rating || isSaving) return;
+
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      await saveCareerSubmission({
+        name: name.trim(),
+        taskOne: taskOne.trim(),
+        taskTwo: taskTwo.trim(),
+        rating,
+        satisfactionNote: satisfactionNote.trim(),
+      });
+      setFinished(true);
+    } catch {
+      setSaveError("저장하지 못했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const goBack = () => {
@@ -247,7 +272,7 @@ export default function Home() {
                 <p className="eyebrow">JOURNEY COMPLETE</p>
                 <h2>{name}님, 진로 여정을 완성했어요!</h2>
                 <p className="rating-lead">오늘의 기록이 앞으로의 선택을 더 단단하게 만들어줄 거예요.</p>
-                <form className="rating-card" onSubmit={(event) => { event.preventDefault(); setFinished(true); }}>
+                <form className="rating-card" onSubmit={submitSatisfaction}>
                   <h3>이번 활동은 얼마나 만족스러웠나요?</h3>
                   <p>별을 눌러 솔직한 만족도를 알려주세요.</p>
                   <div className="stars" role="radiogroup" aria-label="만족도 별점">
@@ -274,8 +299,9 @@ export default function Home() {
                     value={satisfactionNote}
                     onChange={(event) => setSatisfactionNote(event.target.value)}
                   />
-                  <button className="primary-button rating-submit" type="submit" disabled={!rating}>
-                    피드백 보내기 <ArrowIcon />
+                  {saveError && <p className="save-error" role="alert">{saveError}</p>}
+                  <button className="primary-button rating-submit" type="submit" disabled={!rating || isSaving}>
+                    {isSaving ? "저장하는 중..." : "피드백 보내기"} {!isSaving && <ArrowIcon />}
                   </button>
                 </form>
               </>
